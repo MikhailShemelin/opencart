@@ -1,15 +1,14 @@
 <?php
-class ModelToolBackup extends Model {
+namespace Opencart\Application\Model\Tool;
+class Backup extends \Opencart\System\Engine\Model {
 	public function getTables() {
-		$table_data = array();
+		$table_data = [];
 
 		$query = $this->db->query("SHOW TABLES FROM `" . DB_DATABASE . "`");
 
 		foreach ($query->rows as $result) {
-			if (utf8_substr($result['Tables_in_' . DB_DATABASE], 0, strlen(DB_PREFIX)) == DB_PREFIX) {
-				if (isset($result['Tables_in_' . DB_DATABASE])) {
-					$table_data[] = $result['Tables_in_' . DB_DATABASE];
-				}
+			if (isset($result['Tables_in_' . DB_DATABASE]) && utf8_substr($result['Tables_in_' . DB_DATABASE], 0, strlen(DB_PREFIX)) == DB_PREFIX) {
+				$table_data[] = $result['Tables_in_' . DB_DATABASE];
 			}
 		}
 
@@ -30,12 +29,12 @@ class ModelToolBackup extends Model {
 		if ($query->num_rows) {
 			return $query->rows;
 		} else {
-			return array();
+			return [];
 		}
 	}
 
 	public function getTotalRecords($table) {
-		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . $table . "`");
+		$query = $this->db->query("SELECT COUNT(*) AS `total` FROM `" . $table . "`");
 
 		if ($query->num_rows) {
 			return $query->row['total'];

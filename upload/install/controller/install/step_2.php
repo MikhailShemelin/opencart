@@ -1,12 +1,13 @@
 <?php
-class ControllerInstallStep2 extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Install;
+class Step2 extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
 		$this->load->language('install/step_2');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-			$this->response->redirect($this->url->link('install/step_3'));
+			$this->response->redirect($this->url->link('install/step_3', 'language=' . $this->config->get('language_code')));
 		}
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -52,20 +53,26 @@ class ControllerInstallStep2 extends Controller {
 			$data['error_warning'] = '';
 		}
 
-		$data['action'] = $this->url->link('install/step_2');
+		$data['action'] = $this->url->link('install/step_2', 'language=' . $this->config->get('language_code'));
 
 		$data['php_version'] = phpversion();
+
+		if (version_compare(phpversion(), '7.3.0', '<')) {
+			$data['version'] = false;
+		} else {
+			$data['version'] = true;
+		}
+
 		$data['register_globals'] = ini_get('register_globals');
 		$data['magic_quotes_gpc'] = ini_get('magic_quotes_gpc');
 		$data['file_uploads'] = ini_get('file_uploads');
 		$data['session_auto_start'] = ini_get('session_auto_start');
 
-		$db = array(
-			'mysql',
+		$db = [
 			'mysqli',
 			'pgsql',
 			'pdo'
-		);
+		];
 
 		if (!array_filter($db, 'extension_loaded')) {
 			$data['db'] = false;
@@ -105,17 +112,17 @@ class ControllerInstallStep2 extends Controller {
 		$data['catalog_config'] = DIR_OPENCART . 'config.php';
 		$data['admin_config'] = DIR_OPENCART . 'admin/config.php';
 
-		$data['back'] = $this->url->link('install/step_1');
+		$data['back'] = $this->url->link('install/step_1', 'language=' . $this->config->get('language_code'));
 
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
-		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['language'] = $this->load->controller('common/language');
 
 		$this->response->setOutput($this->load->view('install/step_2', $data));
 	}
 
 	private function validate() {
-		if (phpversion() < '5.4') {
+		if (version_compare(phpversion(), '7.3.0', '<')) {
 			$this->error['warning'] = $this->language->get('error_version');
 		}
 
@@ -127,12 +134,11 @@ class ControllerInstallStep2 extends Controller {
 			$this->error['warning'] = $this->language->get('error_session');
 		}
 
-		$db = array(
-			'mysql',
+		$db = [
 			'mysqli',
 			'pdo',
 			'pgsql'
-		);
+		];
 
 		if (!array_filter($db, 'extension_loaded')) {
 			$this->error['warning'] = $this->language->get('error_db');

@@ -1,7 +1,7 @@
 <?php
-
-class ControllerDesignTranslation extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Design;
+class Translation extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
 		$this->load->language('design/translation');
@@ -125,7 +125,7 @@ class ControllerDesignTranslation extends Controller {
 		}
 
 		if (isset($this->request->get['page'])) {
-			$page = $this->request->get['page'];
+			$page = (int)$this->request->get['page'];
 		} else {
 			$page = 1;
 		}
@@ -144,46 +144,54 @@ class ControllerDesignTranslation extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('design/translation', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
+
+		$data['add'] = $this->url->link('design/translation|add', 'user_token=' . $this->session->data['user_token'] . $url);
+		$data['delete'] = $this->url->link('design/translation|delete', 'user_token=' . $this->session->data['user_token'] . $url);
 
 		$this->load->model('localisation/language');
 
-		$data['add'] = $this->url->link('design/translation/add', 'user_token=' . $this->session->data['user_token'] . $url);
-		$data['delete'] = $this->url->link('design/translation/delete', 'user_token=' . $this->session->data['user_token'] . $url);
+		$data['translations'] = [];
 
-		$data['translations'] = array();
-
-		$filter_data = array(
-			'sort' => $sort,
+		$filter_data = [
+			'sort'  => $sort,
 			'order' => $order,
-			'start' => ($page - 1) * $this->config->get('config_limit_admin'),
-			'limit' => $this->config->get('config_limit_admin')
-		);
+			'start' => ($page - 1) * $this->config->get('config_pagination_admin'),
+			'limit' => $this->config->get('config_pagination_admin')
+		];
 
 		$translation_total = $this->model_design_translation->getTotalTranslations();
 
 		$results = $this->model_design_translation->getTranslations($filter_data);
 
 		foreach ($results as $result) {
-			$data['translations'][] = array(
+			$language_info = $this->model_localisation_language->getLanguage($result['language_id']);
+
+			if ($language_info) {
+				$code = $language_info['code'];
+			} else {
+				$code = '';
+			}
+
+			$data['translations'][] = [
 				'translation_id' => $result['translation_id'],
-				'store' => ($result['store_id'] ? $result['store'] : $this->language->get('text_default')),
-				'route' => $result['route'],
-				'language' => $result['language'],
-				'key' => $result['key'],
-				'value' => $result['value'],
-				'edit' => $this->url->link('design/translation/edit', 'user_token=' . $this->session->data['user_token'] . '&translation_id=' . $result['translation_id']),
-			);
+				'store'          => ($result['store_id'] ? $result['store'] : $this->language->get('text_default')),
+				'route'          => $result['route'],
+				'language'       => $code,
+				'key'            => $result['key'],
+				'value'          => $result['value'],
+				'edit'           => $this->url->link('design/translation|edit', 'user_token=' . $this->session->data['user_token'] . '&translation_id=' . $result['translation_id'])
+			];
 		}
 
 		$data['user_token'] = $this->session->data['user_token'];
@@ -205,7 +213,7 @@ class ControllerDesignTranslation extends Controller {
 		if (isset($this->request->post['selected'])) {
 			$data['selected'] = (array)$this->request->post['selected'];
 		} else {
-			$data['selected'] = array();
+			$data['selected'] = [];
 		}
 
 		$url = '';
@@ -226,15 +234,14 @@ class ControllerDesignTranslation extends Controller {
 		$data['sort_key'] = $this->url->link('design/translation', 'user_token=' . $this->session->data['user_token'] . '&sort=key' . $url);
 		$data['sort_value'] = $this->url->link('design/translation', 'user_token=' . $this->session->data['user_token'] . '&sort=value' . $url);
 
-		$pagination = new Pagination();
-		$pagination->total = $translation_total;
-		$pagination->page = $page;
-		$pagination->limit = $this->config->get('config_limit_admin');
-		$pagination->url = $this->url->link('design/translation', 'user_token=' . $this->session->data['user_token'] . '&page={page}');
+		$data['pagination'] = $this->load->controller('common/pagination', [
+			'total' => $translation_total,
+			'page'  => $page,
+			'limit' => $this->config->get('config_pagination_admin'),
+			'url'   => $this->url->link('design/translation', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}')
+		]);
 
-		$data['pagination'] = $pagination->render();
-
-		$data['results'] = sprintf($this->language->get('text_pagination'), ($translation_total) ? (($page - 1) * $this->config->get('config_limit_admin')) + 1 : 0, ((($page - 1) * $this->config->get('config_limit_admin')) > ($translation_total - $this->config->get('config_limit_admin'))) ? $translation_total : ((($page - 1) * $this->config->get('config_limit_admin')) + $this->config->get('config_limit_admin')), $translation_total, ceil($translation_total / $this->config->get('config_limit_admin')));
+		$data['results'] = sprintf($this->language->get('text_pagination'), ($translation_total) ? (($page - 1) * $this->config->get('config_pagination_admin')) + 1 : 0, ((($page - 1) * $this->config->get('config_pagination_admin')) > ($translation_total - $this->config->get('config_pagination_admin'))) ? $translation_total : ((($page - 1) * $this->config->get('config_pagination_admin')) + $this->config->get('config_pagination_admin')), $translation_total, ceil($translation_total / $this->config->get('config_pagination_admin')));
 
 		$data['sort'] = $sort;
 		$data['order'] = $order;
@@ -275,22 +282,22 @@ class ControllerDesignTranslation extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('design/translation', 'user_token=' . $this->session->data['user_token'] . $url)
-		);
+		];
 
 		if (!isset($this->request->get['translation_id'])) {
-			$data['action'] = $this->url->link('design/translation/add', 'user_token=' . $this->session->data['user_token'] . $url);
+			$data['action'] = $this->url->link('design/translation|add', 'user_token=' . $this->session->data['user_token'] . $url);
 		} else {
-			$data['action'] = $this->url->link('design/translation/edit', 'user_token=' . $this->session->data['user_token'] . '&translation_id=' . $this->request->get['translation_id'] . $url);
+			$data['action'] = $this->url->link('design/translation|edit', 'user_token=' . $this->session->data['user_token'] . '&translation_id=' . $this->request->get['translation_id'] . $url);
 		}
 
 		$data['cancel'] = $this->url->link('design/translation', 'user_token=' . $this->session->data['user_token'] . $url);
@@ -361,7 +368,7 @@ class ControllerDesignTranslation extends Controller {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 
-		if ((utf8_strlen($this->request->post['key']) < 3) || (utf8_strlen($this->request->post['key']) > 64)) {
+		if ((utf8_strlen(trim($this->request->post['key'])) < 3) || (utf8_strlen($this->request->post['key']) > 64)) {
 			$this->error['key'] = $this->language->get('error_key');
 		}
 
@@ -379,10 +386,10 @@ class ControllerDesignTranslation extends Controller {
 	public function path() {
 		$this->load->language('design/translation');
 
-		$json = array();
+		$json = [];
 
 		if (isset($this->request->get['language_id'])) {
-			$language_id = $this->request->get['language_id'];
+			$language_id = (int)$this->request->get['language_id'];
 		} else {
 			$language_id = 0;
 		}
@@ -407,6 +414,30 @@ class ControllerDesignTranslation extends Controller {
 					}
 				}
 			}
+
+			$path = glob(DIR_EXTENSION . '*/catalog/language/' . $language_info['code'] . '/*');
+
+			while (count($path) != 0) {
+				$next = array_shift($path);
+
+				foreach ((array)glob($next) as $file) {
+					if (is_dir($file)) {
+						$path[] = $file . '/*';
+					}
+
+					if (substr($file, -4) == '.php') {
+						$new_path = substr($file, strlen(DIR_EXTENSION));
+
+						$code = substr($new_path, 0, strpos($new_path, '/'));
+
+						$length = strlen(DIR_EXTENSION . $code . '/catalog/language/' . $language_info['code'] . '/');
+
+						$route = substr(substr($file, $length), 0, -4);
+
+						$json[] = 'extension/' . $code . '/' . $route;
+					}
+				}
+			}
 		}
 
 		$this->response->addHeader('Content-Type: application/json');
@@ -416,16 +447,16 @@ class ControllerDesignTranslation extends Controller {
 	public function translation() {
 		$this->load->language('design/translation');
 
-		$json = array();
+		$json = [];
 
 		if (isset($this->request->get['store_id'])) {
-			$store_id = $this->request->get['store_id'];
+			$store_id = (int)$this->request->get['store_id'];
 		} else {
 			$store_id = 0;
 		}
 
 		if (isset($this->request->get['language_id'])) {
-			$language_id = $this->request->get['language_id'];
+			$language_id = (int)$this->request->get['language_id'];
 		} else {
 			$language_id = 0;
 		}
@@ -440,18 +471,29 @@ class ControllerDesignTranslation extends Controller {
 
 		$language_info = $this->model_localisation_language->getLanguage($language_id);
 
-		$directory = DIR_CATALOG . 'language/';
+		$part = explode('/', $route);
+
+		if ($part[0] != 'extension') {
+			$directory = DIR_CATALOG . 'language/';
+		} else {
+			$directory = DIR_EXTENSION . $part[1] . '/catalog/language/';
+
+			array_shift($part);
+			array_shift($part);
+
+			$route = implode('/', $part);
+		}
 
 		if ($language_info && is_file($directory . $language_info['code'] . '/' . $route . '.php') && substr(str_replace('\\', '/', realpath($directory . $language_info['code'] . '/' . $route . '.php')), 0, strlen($directory)) == str_replace('\\', '/', $directory)) {
-			$_ = array();
+			$_ = [];
 
 			include($directory . $language_info['code'] . '/' . $route . '.php');
 
 			foreach ($_ as $key => $value) {
-				$json[] = array(
+				$json[] = [
 					'key'   => $key,
 					'value' => $value
-				);
+				];
 			}
 		}
 

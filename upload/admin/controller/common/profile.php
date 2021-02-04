@@ -1,6 +1,7 @@
 <?php
-class ControllerCommonProfile extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Common;
+class Profile extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
 		$this->load->language('common/profile');
@@ -10,10 +11,10 @@ class ControllerCommonProfile extends Controller {
 		$this->load->model('user/user');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
-			$user_data = array_merge($this->request->post, array(
+			$user_data = array_merge($this->request->post, [
 				'user_group_id' => $this->user->getGroupId(),
 				'status'        => 1,
-			));
+			]);
 			
 			$this->model_user_user->editUser($this->user->getId(), $user_data);
 
@@ -72,17 +73,17 @@ class ControllerCommonProfile extends Controller {
 			$data['error_email'] = '';
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('common/profile', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
 		$data['action'] = $this->url->link('common/profile', 'user_token=' . $this->session->data['user_token']);
 
@@ -146,15 +147,13 @@ class ControllerCommonProfile extends Controller {
 
 		$this->load->model('tool/image');
 
-		if (isset($this->request->post['image']) && is_file(DIR_IMAGE . $this->request->post['image'])) {
-			$data['thumb'] = $this->model_tool_image->resize($this->request->post['image'], 100, 100);
-		} elseif (!empty($user_info) && $user_info['image'] && is_file(DIR_IMAGE . $user_info['image'])) {
-			$data['thumb'] = $this->model_tool_image->resize($user_info['image'], 100, 100);
-		} else {
-			$data['thumb'] = $this->model_tool_image->resize('no_image.png', 100, 100);
-		}
-		
 		$data['placeholder'] = $this->model_tool_image->resize('no_image.png', 100, 100);
+
+		if (is_file(DIR_IMAGE . html_entity_decode($data['image'], ENT_QUOTES, 'UTF-8'))) {
+			$data['thumb'] = $this->model_tool_image->resize(html_entity_decode($data['image'], ENT_QUOTES, 'UTF-8'), 100, 100);
+		} else {
+			$data['thumb'] = $data['placeholder'];
+		}
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');

@@ -11,7 +11,7 @@ $_['text_cheque']               = 'Cheque';
 $_['text_paypal']               = 'PayPal';
 $_['text_bank']                 = 'Bank Transfer';
 $_['text_success']              = 'Success: Your account has been successfully updated.';
-$_['text_agree']                = 'I have read and agree to the <a href="%s" class="agree"><b>%s</b></a>';
+$_['text_agree']                = 'I have read and agree to the <a href="%s" class="modal-link"><b>%s</b></a>';
 
 // Entry
 $_['entry_company']             = 'Company';
@@ -33,3 +33,4 @@ $_['error_paypal']              = 'PayPal Email Address does not appear to be va
 $_['error_bank_account_name']   = 'Account Name required!';
 $_['error_bank_account_number'] = 'Account Number required!';
 $_['error_custom_field']        = '%s required!';
+$_['error_regex']               = '%s not a valid input!';

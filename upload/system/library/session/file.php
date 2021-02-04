@@ -1,7 +1,9 @@
 <?php
-namespace Session;
+namespace Opencart\System\Library\Session;
 class File {
-	private $directory;
+	public function __construct($registry) {
+		$this->config = $registry->get('config');
+	}
 
 	public function read($session_id) {
 		$file = DIR_SESSION . 'sess_' . basename($session_id);
@@ -20,22 +22,24 @@ class File {
 
 				fclose($handle);
 
-				return unserialize($data);
+				return json_decode($data, true);
+			} else {
+				return [];
 			}
 		}
 
-		return array();
+		return [];
 	}
 
 	public function write($session_id, $data) {
 		$file = DIR_SESSION . 'sess_' . basename($session_id);
 
-		$handle = fopen($file, 'w');
+		$handle = fopen($file, 'c');
 
 		flock($handle, LOCK_EX);
 
-		fwrite($handle, serialize($data));
-
+		fwrite($handle, json_encode($data));
+		ftruncate($handle, ftell($handle));
 		fflush($handle);
 
 		flock($handle, LOCK_UN);
@@ -53,26 +57,14 @@ class File {
 		}
 	}
 
-	public function __destruct() {
-		if (ini_get('session.gc_divisor')) {
-			$gc_divisor = ini_get('session.gc_divisor');
-		} else {
-			$gc_divisor = 1;
-		}
-
-		if (ini_get('session.gc_probability')) {
-			$gc_probability = ini_get('session.gc_probability');
-		} else {
-			$gc_probability = 1;
-		}
-
-		if ((rand() % $gc_divisor) < $gc_probability) {
-			$expire = time() - ini_get('session.gc_maxlifetime');
+	public function gc() {
+		if (round(rand(1, $this->config->get('session_divisor') / $this->config->get('session_probability'))) == 1) {
+			$expire = time() - $this->config->get('session_expire');
 
 			$files = glob(DIR_SESSION . 'sess_*');
 
 			foreach ($files as $file) {
-				if (filemtime($file) < $expire) {
+				if (is_file($file) && filemtime($file) > $expire) {
 					unlink($file);
 				}
 			}

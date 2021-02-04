@@ -2,26 +2,24 @@
 <div id="content">
   <div class="page-header">
     <div class="container-fluid">
-      <div class="pull-right">
-        <button id="button-send" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_send }}" class="btn btn-primary" onclick="send('index.php?route=marketing/contact/send&user_token={{ user_token }}');"><i class="fa fa-envelope"></i></button>
-        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light"><i class="fa fa-reply"></i></a></div>
+      <div class="float-right">
+        <button id="button-send" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_send }}" class="btn btn-primary" onclick="send('index.php?route=marketing/contact|send&user_token={{ user_token }}');"><i class="fas fa-envelope"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light"><i class="fas fa-reply"></i></a></div>
       <h1>{{ heading_title }}</h1>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          {% for breadcrumb in breadcrumbs %}
-            <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
-          {% endfor %}
-        </ol>
-      </nav>
+      <ol class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ol>
     </div>
   </div>
   <div class="container-fluid">
     <div class="card">
-      <div class="card-header"><i class="fa fa-envelope"></i> {{ heading_title }}</div>
+      <div class="card-header"><i class="fas fa-envelope"></i> {{ heading_title }}</div>
       <div class="card-body">
         <form>
           <div class="form-group row">
-            <label class="col-sm-2 col-form-label" for="input-store">{{ entry_store }}</label>
+            <label for="input-store" class="col-sm-2 col-form-label">{{ entry_store }}</label>
             <div class="col-sm-10">
               <select name="store_id" id="input-store" class="form-control">
                 <option value="0">{{ text_default }}</option>
@@ -32,7 +30,7 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-2 col-form-label" for="input-to">{{ entry_to }}</label>
+            <label for="input-to" class="col-sm-2 col-form-label">{{ entry_to }}</label>
             <div class="col-sm-10">
               <select name="to" id="input-to" class="form-control">
                 <option value="newsletter">{{ text_newsletter }}</option>
@@ -46,7 +44,7 @@
             </div>
           </div>
           <div class="form-group row to" id="to-customer-group">
-            <label class="col-sm-2 col-form-label" for="input-customer-group">{{ entry_customer_group }}</label>
+            <label for="input-customer-group" class="col-sm-2 col-form-label">{{ entry_customer_group }}</label>
             <div class="col-sm-10">
               <select name="customer_group_id" id="input-customer-group" class="form-control">
                 {% for customer_group in customer_groups %}
@@ -56,37 +54,43 @@
             </div>
           </div>
           <div class="form-group row to" id="to-customer">
-            <label class="col-sm-2 col-form-label" for="input-customer">{{ entry_customer }}</label>
+            <label class="col-sm-2 col-form-label">{{ entry_customer }}</label>
             <div class="col-sm-10">
               <input type="text" name="customers" value="" placeholder="{{ entry_customer }}" id="input-customer" class="form-control"/>
-              <div id="mail-customer" class="form-control" style="height: 150px; overflow: auto;"></div>
+              <div class="form-control p-0" style="height: 150px; overflow: auto;">
+                <table id="mail-customer" class="table table-sm m-0"></table>
+              </div>
               <small class="form-text text-muted">{{ help_customer }}</small>
             </div>
           </div>
           <div class="form-group row to" id="to-affiliate">
-            <label class="col-sm-2 col-form-label" for="input-affiliate">{{ entry_affiliate }}</label>
+            <label class="col-sm-2 col-form-label">{{ entry_affiliate }}</label>
             <div class="col-sm-10">
               <input type="text" name="affiliates" value="" placeholder="{{ entry_affiliate }}" id="input-affiliate" class="form-control"/>
-              <div id="mail-affiliate" class="form-control" style="height: 150px; overflow: auto;"></div>
+              <div class="form-control p-0" style="height: 150px; overflow: auto;">
+                <table id="mail-affiliate" class="table table-sm m-0"></table>
+              </div>
               <small class="form-text text-muted">{{ help_affiliate }}</small>
             </div>
           </div>
           <div class="form-group row to" id="to-product">
-            <label class="col-sm-2 col-form-label" for="input-product">{{ entry_product }}</label>
+            <label class="col-sm-2 col-form-label">{{ entry_product }}</label>
             <div class="col-sm-10">
               <input type="text" name="products" value="" placeholder="{{ entry_product }}" id="input-product" class="form-control"/>
-              <div id="mail-product" class="form-control" style="height: 150px; overflow: auto;"></div>
+              <div class="form-control p-0" style="height: 150px; overflow: auto;">
+                <table id="mail-product" class="table table-sm m-0"></table>
+              </div>
               <small class="form-text text-muted">{{ help_product }}</small>
             </div>
           </div>
           <div class="form-group row required">
-            <label class="col-sm-2 col-form-label" for="input-subject">{{ entry_subject }}</label>
+            <label for="input-subject" class="col-sm-2 col-form-label">{{ entry_subject }}</label>
             <div class="col-sm-10">
               <input type="text" name="subject" value="" placeholder="{{ entry_subject }}" id="input-subject" class="form-control"/>
             </div>
           </div>
           <div class="form-group row required">
-            <label class="col-sm-2 col-form-label" for="input-message">{{ entry_message }}</label>
+            <label for="input-message" class="col-sm-2 col-form-label">{{ entry_message }}</label>
             <div class="col-sm-10">
               <textarea name="message" placeholder="{{ entry_message }}" id="input-message" data-toggle="ckeditor" data-lang="{{ ckeditor }}" class="form-control"></textarea>
             </div>
@@ -97,8 +101,6 @@
   </div>
 </div>
 <script type="text/javascript"><!--
-CKEDITOR.timestamp = Math.random();
-
 $('textarea[data-toggle=\'ckeditor\']').ckeditor();
 
 $('select[name=\'to\']').on('change', function() {
@@ -114,7 +116,7 @@ $('select[name=\'to\']').trigger('change');
 $('input[name=\'customers\']').autocomplete({
 	'source': function(request, response) {
 		$.ajax({
-			url: 'index.php?route=customer/customer/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+			url: 'index.php?route=customer/customer|autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
 			dataType: 'json',
 			success: function(json) {
 				response($.map(json, function(item) {
@@ -134,19 +136,24 @@ $('input[name=\'customers\']').autocomplete({
 
 		$('#mail-customer' + item['value']).remove();
 
-		$('#mail-customer').append('<div id="mail-customer' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="customer[]" value="' + item['value'] + '" /></div>');
+		html  = '<tr id="mail-customer' + item['value'] + '">';
+		html += '  <td>' + item['label'] + '<input type="hidden" name="customer[]" value="' + item['value'] + '"/></td>';
+		html += '  <td class="text-right"><button type="button" class="btn btn-danger btn-sm"><i class="fas fa-minus-circle"></i></button></td>';
+		html += '</tr>';
+
+		$('#mail-customer').append(html);
 	}
 });
 
-$('#mail-customer').on('click', '.fa-minus-circle', function() {
-	$(this).parent().remove();
+$('#mail-customer').on('click', '.btn', function() {
+	$(this).parent().parent().remove();
 });
 
 // Affiliates
 $('input[name=\'affiliates\']').autocomplete({
 	'source': function(request, response) {
 		$.ajax({
-			url: 'index.php?route=customer/customer/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request) + '&filter_affiliate=1',
+			url: 'index.php?route=customer/customer|autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request) + '&filter_affiliate=1',
 			dataType: 'json',
 			success: function(json) {
 				response($.map(json, function(item) {
@@ -166,19 +173,24 @@ $('input[name=\'affiliates\']').autocomplete({
 
 		$('#mail-affiliate' + item['value']).remove();
 
-		$('#mail-affiliate').append('<div id="mail-affiliate' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="affiliate[]" value="' + item['value'] + '" /></div>');
+		html  = '<tr id="mail-affiliate' + item['value'] + '">';
+		html += '  <td>' + item['label'] + '<input type="hidden" name="affiliate[]" value="' + item['value'] + '"/></td>';
+		html += '  <td class="text-right"><button type="button" class="btn btn-danger btn-sm"><i class="fas fa-minus-circle"></i></button></td>';
+		html += '</tr>';
+
+		$('#mail-affiliate').append(html);
 	}
 });
 
-$('#input-affiliate').on('click', '.fa-minus-circle', function() {
-	$(this).parent().remove();
+$('#input-affiliate').on('click', '.btn', function() {
+	$(this).parent().parent().remove();
 });
 
 // Products
 $('input[name=\'products\']').autocomplete({
 	'source': function(request, response) {
 		$.ajax({
-			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+			url: 'index.php?route=catalog/product|autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
 			dataType: 'json',
 			success: function(json) {
 				response($.map(json, function(item) {
@@ -198,19 +210,28 @@ $('input[name=\'products\']').autocomplete({
 
 		$('#mail-product' + item['value']).remove();
 
-		$('#mail-product').append('<div id="mail-product' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="product[]" value="' + item['value'] + '" /></div>');
+		html  = '<tr id="mail-product' + item['value'] + '">';
+		html += '  <td>' + item['label'] + '<input type="hidden" name="product[]" value="' + item['value'] + '"/></td>';
+		html += '  <td class="text-right"><button type="button" class="btn btn-danger btn-sm"><i class="fas fa-minus-circle"></i></button></td>';
+		html += '</tr>';
+
+		$('#mail-product').append(html);
 	}
 });
 
-$('#mail-product').on('click', '.fa-minus-circle', function() {
-	$(this).parent().remove();
+$('#mail-product').on('click', '.btn', function() {
+	$(this).parent().parent().remove();
 });
 
 function send(url) {
+	for (instance in CKEDITOR.instances) {
+		CKEDITOR.instances[instance].updateElement();
+	}
+
 	$.ajax({
 		url: url,
 		type: 'post',
-		data: $('#content select, #content input, #content textarea'),
+		data: $('#content form').serialize(),
 		dataType: 'json',
 		beforeSend: function() {
 			$('#button-send').button('loading');
@@ -223,11 +244,11 @@ function send(url) {
 
 			if (json['error']) {
 				if (json['error']['warning']) {
-					$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error']['warning'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+					$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fas fa-exclamation-circle"></i> ' + json['error']['warning'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 				}
 
 				if (json['error']['email']) {
-					$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error']['email'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+					$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fas fa-exclamation-circle"></i> ' + json['error']['email'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 				}
 
 				if (json['error']['subject']) {
@@ -240,7 +261,7 @@ function send(url) {
 			}
 
 			if (json['success']) {
-				$('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i>  ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+				$('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fas fa-check-circle"></i>  ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
 			}
 
 			if (json['next']) {
@@ -252,6 +273,5 @@ function send(url) {
 		}
 	});
 }
-
 //--></script>
 {{ footer }}

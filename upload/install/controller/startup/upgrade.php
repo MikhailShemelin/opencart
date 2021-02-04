@@ -1,5 +1,6 @@
 <?php
-class ControllerStartupUpgrade extends Controller {
+namespace Opencart\Application\Controller\Startup;
+class Upgrade extends \Opencart\System\Engine\Controller {
 	public function index() {
 		$upgrade = false;
 		
@@ -8,9 +9,9 @@ class ControllerStartupUpgrade extends Controller {
 		}
 		
 		if (isset($this->request->get['route'])) {
-			if (($this->request->get['route'] == 'install/step_4') || (substr($this->request->get['route'], 0, 8) == 'upgrade/') || (substr($this->request->get['route'], 0, 10) == '3rd_party/')) {
-				$upgrade = false;
-			}
+            if ((strpos($this->request->get['route'], 'install/step_') !== false) || (substr($this->request->get['route'], 0, 8) == 'upgrade/') || (substr($this->request->get['route'], 0, 10) == '3rd_party/')) {
+                $upgrade = false;
+            }
 		}
 		
 		if ($upgrade) {

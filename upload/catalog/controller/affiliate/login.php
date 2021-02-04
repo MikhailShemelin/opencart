@@ -1,9 +1,10 @@
 <?php
-class ControllerAffiliateLogin extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Affiliate;
+class Login extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
-		if ($this->customer->isLogged()) {
+		if (!$this->config->get('config_affiliate_status') || $this->customer->isLogged()) {
 			$this->response->redirect($this->url->link('account/account', 'language=' . $this->config->get('config_language')));
 		}
 
@@ -20,12 +21,10 @@ class ControllerAffiliateLogin extends Controller {
 			// Default Shipping Address
 			$this->load->model('account/address');
 
-			if ($this->config->get('config_tax_customer') == 'payment') {
-				$this->session->data['payment_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
-			}
+			$address_info = $this->model_account_address->getAddress($this->customer->getAddressId());
 
-			if ($this->config->get('config_tax_customer') == 'shipping') {
-				$this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
+			if ($this->config->get('config_tax_customer') && $address_info) {
+				$this->session->data[$this->config->get('config_tax_customer') . '_address'] = $address_info;
 			}
 
 			// Wishlist
@@ -50,22 +49,22 @@ class ControllerAffiliateLogin extends Controller {
 			}
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_account'),
 			'href' => $this->url->link('account/account', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_login'),
 			'href' => $this->url->link('affiliate/login', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
 		$data['text_description'] = sprintf($this->language->get('text_description'), $this->config->get('config_name'), $this->config->get('config_name'), $this->config->get('config_affiliate_commission') . '%');
 
@@ -120,6 +119,17 @@ class ControllerAffiliateLogin extends Controller {
 	}
 
 	protected function validate() {
+		$keys = [
+			'email',
+			'password'
+		];
+
+		foreach ($keys as $key) {
+			if (!isset($this->request->post[$key])) {
+				$this->request->post[$key] = '';
+			}
+		}
+
 		// Check how many login attempts have been made.
 		$login_info = $this->model_account_customer->getLoginAttempts($this->request->post['email']);
 
@@ -135,7 +145,7 @@ class ControllerAffiliateLogin extends Controller {
 		}
 
 		if (!$this->error) {
-			if (!$this->customer->login($this->request->post['email'], $this->request->post['password'])) {
+			if (!$this->customer->login($this->request->post['email'], html_entity_decode($this->request->post['password'], ENT_QUOTES, 'UTF-8'))) {
 				$this->error['warning'] = $this->language->get('error_login');
 
 				$this->model_account_customer->addLoginAttempt($this->request->post['email']);
@@ -143,7 +153,7 @@ class ControllerAffiliateLogin extends Controller {
 				$this->model_account_customer->deleteLoginAttempts($this->request->post['email']);
 			}
 		}
-		
+
 		return !$this->error;
 	}
 }

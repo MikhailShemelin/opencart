@@ -1,41 +1,43 @@
 <?php
-class ControllerMailForgotten extends Controller {
+namespace Opencart\Application\Controller\Mail;
+class Forgotten extends \Opencart\System\Engine\Controller {
+	//catalog/model/account/customer/editCode/after
 	public function index(&$route, &$args, &$output) {
 		if ($args[0] && $args[1]) {
-			$this->load->language('mail/forgotten');
+			$this->load->model('account/customer');
 
-			$data['text_greeting'] = sprintf($this->language->get('text_greeting'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
-			$data['text_change'] = $this->language->get('text_change');
-			$data['text_ip'] = $this->language->get('text_ip');
-			$data['button_reset'] = $this->language->get('button_reset');
+			$customer_info = $this->model_account_customer->getCustomerByEmail($args[0]);
 
-			$data['reset'] = str_replace('&amp;', '&', $this->url->link('account/reset', 'language=' . $this->config->get('config_language') . '&email=' . urlencode($args[0]) . '&code=' . $args[1]));
-			$data['ip'] = $this->request->server['REMOTE_ADDR'];
-			$data['store_url'] = HTTP_SERVER;
-			$data['store'] = html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8');
+			if ($customer_info) {
+				$this->load->language('mail/forgotten');
 
-			$this->load->model('tool/image');
+				$store_name = html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8');
 
-			if (is_file(DIR_IMAGE . $this->config->get('config_logo'))) {
-				$data['logo'] = $this->model_tool_image->resize($this->config->get('config_logo'), $this->config->get('theme_default_image_location_width'), $this->config->get('theme_default_image_cart_height'));
-			} else {
-				$data['logo'] = '';
+				$subject = sprintf($this->language->get('text_subject'), $store_name);
+
+				$data['text_greeting'] = sprintf($this->language->get('text_greeting'), $store_name);
+
+				$data['reset'] = $this->url->link('account/reset', 'language=' . $this->config->get('config_language') . '&email=' . urlencode($args[0]) . '&code=' . $args[1], true);
+				$data['ip'] = $this->request->server['REMOTE_ADDR'];
+
+				$data['store'] = $store_name;
+				$data['store_url'] = $this->config->get('config_url');
+
+				$mail = new \Opencart\System\Library\Mail($this->config->get('config_mail_engine'));
+				$mail->parameter = $this->config->get('config_mail_parameter');
+				$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
+				$mail->smtp_username = $this->config->get('config_mail_smtp_username');
+				$mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
+				$mail->smtp_port = $this->config->get('config_mail_smtp_port');
+				$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
+
+				$mail->setTo($args[0]);
+				$mail->setFrom($this->config->get('config_email'));
+				$mail->setSender($store_name);
+				$mail->setSubject($subject);
+				$mail->setHtml($this->load->view('mail/forgotten', $data));
+				$mail->send();
 			}
-
-			$mail = new Mail($this->config->get('config_mail_engine'));
-			$mail->parameter = $this->config->get('config_mail_parameter');
-			$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
-			$mail->smtp_username = $this->config->get('config_mail_smtp_username');
-			$mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-			$mail->smtp_port = $this->config->get('config_mail_smtp_port');
-			$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
-
-			$mail->setTo($args[0]);
-			$mail->setFrom($this->config->get('config_email'));
-			$mail->setSender(html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
-			$mail->setSubject(html_entity_decode(sprintf($this->language->get('text_subject'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8')), ENT_QUOTES, 'UTF-8'));
-			$mail->setHtml($this->load->view('mail/forgotten', $data));
-			$mail->send();
 		}
 	}
 }

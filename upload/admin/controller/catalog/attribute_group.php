@@ -1,6 +1,7 @@
 <?php
-class ControllerCatalogAttributeGroup extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Catalog;
+class AttributeGroup extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
 		$this->load->language('catalog/attribute_group');
@@ -124,7 +125,7 @@ class ControllerCatalogAttributeGroup extends Controller {
 		}
 
 		if (isset($this->request->get['page'])) {
-			$page = $this->request->get['page'];
+			$page = (int)$this->request->get['page'];
 		} else {
 			$page = 1;
 		}
@@ -143,41 +144,41 @@ class ControllerCatalogAttributeGroup extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('catalog/attribute_group', 'user_token=' . $this->session->data['user_token'] . $url)
-		);
+		];
 
-		$data['add'] = $this->url->link('catalog/attribute_group/add', 'user_token=' . $this->session->data['user_token'] . $url);
-		$data['delete'] = $this->url->link('catalog/attribute_group/delete', 'user_token=' . $this->session->data['user_token'] . $url);
+		$data['add'] = $this->url->link('catalog/attribute_group|add', 'user_token=' . $this->session->data['user_token'] . $url);
+		$data['delete'] = $this->url->link('catalog/attribute_group|delete', 'user_token=' . $this->session->data['user_token'] . $url);
 
-		$data['attribute_groups'] = array();
+		$data['attribute_groups'] = [];
 
-		$filter_data = array(
+		$filter_data = [
 			'sort'  => $sort,
 			'order' => $order,
-			'start' => ($page - 1) * $this->config->get('config_limit_admin'),
-			'limit' => $this->config->get('config_limit_admin')
-		);
+			'start' => ($page - 1) * $this->config->get('config_pagination_admin'),
+			'limit' => $this->config->get('config_pagination_admin')
+		];
 
 		$attribute_group_total = $this->model_catalog_attribute_group->getTotalAttributeGroups();
 
 		$results = $this->model_catalog_attribute_group->getAttributeGroups($filter_data);
 
 		foreach ($results as $result) {
-			$data['attribute_groups'][] = array(
+			$data['attribute_groups'][] = [
 				'attribute_group_id' => $result['attribute_group_id'],
 				'name'               => $result['name'],
 				'sort_order'         => $result['sort_order'],
-				'edit'               => $this->url->link('catalog/attribute_group/edit', 'user_token=' . $this->session->data['user_token'] . '&attribute_group_id=' . $result['attribute_group_id'] . $url)
-			);
+				'edit'               => $this->url->link('catalog/attribute_group|edit', 'user_token=' . $this->session->data['user_token'] . '&attribute_group_id=' . $result['attribute_group_id'] . $url)
+			];
 		}
 
 		if (isset($this->error['warning'])) {
@@ -197,7 +198,7 @@ class ControllerCatalogAttributeGroup extends Controller {
 		if (isset($this->request->post['selected'])) {
 			$data['selected'] = (array)$this->request->post['selected'];
 		} else {
-			$data['selected'] = array();
+			$data['selected'] = [];
 		}
 
 		$url = '';
@@ -225,15 +226,14 @@ class ControllerCatalogAttributeGroup extends Controller {
 			$url .= '&order=' . $this->request->get['order'];
 		}
 
-		$pagination = new Pagination();
-		$pagination->total = $attribute_group_total;
-		$pagination->page = $page;
-		$pagination->limit = $this->config->get('config_limit_admin');
-		$pagination->url = $this->url->link('catalog/attribute_group', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}');
+		$data['pagination'] = $this->load->controller('common/pagination', [
+			'total' => $attribute_group_total,
+			'page'  => $page,
+			'limit' => $this->config->get('config_pagination_admin'),
+			'url'   => $this->url->link('catalog/attribute_group', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}')
+		]);
 
-		$data['pagination'] = $pagination->render();
-
-		$data['results'] = sprintf($this->language->get('text_pagination'), ($attribute_group_total) ? (($page - 1) * $this->config->get('config_limit_admin')) + 1 : 0, ((($page - 1) * $this->config->get('config_limit_admin')) > ($attribute_group_total - $this->config->get('config_limit_admin'))) ? $attribute_group_total : ((($page - 1) * $this->config->get('config_limit_admin')) + $this->config->get('config_limit_admin')), $attribute_group_total, ceil($attribute_group_total / $this->config->get('config_limit_admin')));
+		$data['results'] = sprintf($this->language->get('text_pagination'), ($attribute_group_total) ? (($page - 1) * $this->config->get('config_pagination_admin')) + 1 : 0, ((($page - 1) * $this->config->get('config_pagination_admin')) > ($attribute_group_total - $this->config->get('config_pagination_admin'))) ? $attribute_group_total : ((($page - 1) * $this->config->get('config_pagination_admin')) + $this->config->get('config_pagination_admin')), $attribute_group_total, ceil($attribute_group_total / $this->config->get('config_pagination_admin')));
 
 		$data['sort'] = $sort;
 		$data['order'] = $order;
@@ -257,7 +257,7 @@ class ControllerCatalogAttributeGroup extends Controller {
 		if (isset($this->error['name'])) {
 			$data['error_name'] = $this->error['name'];
 		} else {
-			$data['error_name'] = array();
+			$data['error_name'] = [];
 		}
 
 		$url = '';
@@ -274,22 +274,22 @@ class ControllerCatalogAttributeGroup extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('catalog/attribute_group', 'user_token=' . $this->session->data['user_token'] . $url)
-		);
+		];
 
 		if (!isset($this->request->get['attribute_group_id'])) {
-			$data['action'] = $this->url->link('catalog/attribute_group/add', 'user_token=' . $this->session->data['user_token'] . $url);
+			$data['action'] = $this->url->link('catalog/attribute_group|add', 'user_token=' . $this->session->data['user_token'] . $url);
 		} else {
-			$data['action'] = $this->url->link('catalog/attribute_group/edit', 'user_token=' . $this->session->data['user_token'] . '&attribute_group_id=' . $this->request->get['attribute_group_id'] . $url);
+			$data['action'] = $this->url->link('catalog/attribute_group|edit', 'user_token=' . $this->session->data['user_token'] . '&attribute_group_id=' . $this->request->get['attribute_group_id'] . $url);
 		}
 
 		$data['cancel'] = $this->url->link('catalog/attribute_group', 'user_token=' . $this->session->data['user_token'] . $url);
@@ -304,10 +304,10 @@ class ControllerCatalogAttributeGroup extends Controller {
 
 		if (isset($this->request->post['attribute_group_description'])) {
 			$data['attribute_group_description'] = $this->request->post['attribute_group_description'];
-		} elseif (isset($this->request->get['attribute_group_id'])) {
-			$data['attribute_group_description'] = $this->model_catalog_attribute_group->getAttributeGroupDescriptions($this->request->get['attribute_group_id']);
+		} elseif (!empty($attribute_group_info)) {
+			$data['attribute_group_description'] = $this->model_catalog_attribute_group->getDescriptions($this->request->get['attribute_group_id']);
 		} else {
-			$data['attribute_group_description'] = array();
+			$data['attribute_group_description'] = [];
 		}
 
 		if (isset($this->request->post['sort_order'])) {
@@ -331,9 +331,13 @@ class ControllerCatalogAttributeGroup extends Controller {
 		}
 
 		foreach ($this->request->post['attribute_group_description'] as $language_id => $value) {
-			if ((utf8_strlen($value['name']) < 1) || (utf8_strlen($value['name']) > 64)) {
+			if ((utf8_strlen(trim($value['name'])) < 1) || (utf8_strlen($value['name']) > 64)) {
 				$this->error['name'][$language_id] = $this->language->get('error_name');
 			}
+		}
+
+		if ($this->error && !isset($this->error['warning'])) {
+			$this->error['warning'] = $this->language->get('error_warning');
 		}
 
 		return !$this->error;

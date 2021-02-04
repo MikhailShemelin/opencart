@@ -1,5 +1,6 @@
 <?php
-class ControllerProductCompare extends Controller {
+namespace Opencart\Application\Controller\Product;
+class Compare extends \Opencart\System\Engine\Controller {
 	public function index() {
 		$this->load->language('product/compare');
 
@@ -8,7 +9,7 @@ class ControllerProductCompare extends Controller {
 		$this->load->model('tool/image');
 
 		if (!isset($this->session->data['compare'])) {
-			$this->session->data['compare'] = array();
+			$this->session->data['compare'] = [];
 		}
 
 		if (isset($this->request->get['remove'])) {
@@ -25,17 +26,17 @@ class ControllerProductCompare extends Controller {
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('product/compare', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
 		if (isset($this->session->data['success'])) {
 			$data['success'] = $this->session->data['success'];
@@ -45,18 +46,16 @@ class ControllerProductCompare extends Controller {
 			$data['success'] = '';
 		}
 
-		$data['review_status'] = $this->config->get('config_review_status');
+		$data['products'] = [];
 
-		$data['products'] = array();
-
-		$data['attribute_groups'] = array();
+		$data['attribute_groups'] = [];
 
 		foreach ($this->session->data['compare'] as $key => $product_id) {
 			$product_info = $this->model_catalog_product->getProduct($product_id);
 
 			if ($product_info) {
-				if ($product_info['image']) {
-					$image = $this->model_tool_image->resize($product_info['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_compare_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_compare_height'));
+				if (is_file(DIR_IMAGE . html_entity_decode($product_info['image'], ENT_QUOTES, 'UTF-8'))) {
+					$image = $this->model_tool_image->resize(html_entity_decode($product_info['image'], ENT_QUOTES, 'UTF-8'), $this->config->get('config_image_compare_width'), $this->config->get('config_image_compare_height'));
 				} else {
 					$image = false;
 				}
@@ -81,9 +80,9 @@ class ControllerProductCompare extends Controller {
 					$availability = $this->language->get('text_instock');
 				}
 
-				$attribute_data = array();
+				$attribute_data = [];
 
-				$attribute_groups = $this->model_catalog_product->getProductAttributes($product_id);
+				$attribute_groups = $this->model_catalog_product->getAttributes($product_id);
 
 				foreach ($attribute_groups as $attribute_group) {
 					foreach ($attribute_group['attribute'] as $attribute) {
@@ -91,7 +90,7 @@ class ControllerProductCompare extends Controller {
 					}
 				}
 
-				$data['products'][$product_id] = array(
+				$data['products'][$product_id] = [
 					'product_id'   => $product_info['product_id'],
 					'name'         => $product_info['name'],
 					'thumb'        => $image,
@@ -111,7 +110,7 @@ class ControllerProductCompare extends Controller {
 					'attribute'    => $attribute_data,
 					'href'         => $this->url->link('product/product', 'language=' . $this->config->get('config_language') . '&product_id=' . $product_id),
 					'remove'       => $this->url->link('product/compare', 'language=' . $this->config->get('config_language') . '&remove=' . $product_id)
-				);
+				];
 
 				foreach ($attribute_groups as $attribute_group) {
 					$data['attribute_groups'][$attribute_group['attribute_group_id']]['name'] = $attribute_group['name'];
@@ -124,8 +123,6 @@ class ControllerProductCompare extends Controller {
 				unset($this->session->data['compare'][$key]);
 			}
 		}
-
-		$data['language'] = $this->config->get('config_language');
 
 		$data['continue'] = $this->url->link('common/home', 'language=' . $this->config->get('config_language'));
 
@@ -142,10 +139,10 @@ class ControllerProductCompare extends Controller {
 	public function add() {
 		$this->load->language('product/compare');
 
-		$json = array();
+		$json = [];
 
 		if (!isset($this->session->data['compare'])) {
-			$this->session->data['compare'] = array();
+			$this->session->data['compare'] = [];
 		}
 
 		if (isset($this->request->post['product_id'])) {

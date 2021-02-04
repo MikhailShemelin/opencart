@@ -1,6 +1,7 @@
 <?php
-class ControllerAccountReset extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Account;
+class Reset extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
 		if ($this->customer->isLogged()) {
@@ -43,22 +44,22 @@ class ControllerAccountReset extends Controller {
 			$this->response->redirect($this->url->link('account/login', 'language=' . $this->config->get('config_language')));
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_account'),
 			'href' => $this->url->link('account/account', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('account/reset', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
 		if (isset($this->error['password'])) {
 			$data['error_password'] = $this->error['password'];
@@ -99,6 +100,17 @@ class ControllerAccountReset extends Controller {
 	}
 
 	protected function validate() {
+		$keys = [
+			'password',
+			'confirm'
+		];
+
+		foreach ($keys as $key) {
+			if (!isset($this->request->post[$key])) {
+				$this->request->post[$key] = '';
+			}
+		}
+
 		if ((utf8_strlen(html_entity_decode($this->request->post['password'], ENT_QUOTES, 'UTF-8')) < 4) || (utf8_strlen(html_entity_decode($this->request->post['password'], ENT_QUOTES, 'UTF-8')) > 40)) {
 			$this->error['password'] = $this->language->get('error_password');
 		}

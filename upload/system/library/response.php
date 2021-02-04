@@ -9,9 +9,13 @@
 
 /**
 * Response class
+ *
+ * Stores the response so the correct headers can go out before the response output is shown.
+ *
 */
+namespace Opencart\System\Library;
 class Response {
-	private $headers = array();
+	private $headers = [];
 	private $level = 0;
 	private $output;
 
@@ -26,19 +30,19 @@ class Response {
 	}
 	
 	/**
-	 * 
+	 * Redirect
 	 *
 	 * @param	string	$url
 	 * @param	int		$status
 	 *
  	*/
 	public function redirect($url, $status = 302) {
-		header('Location: ' . str_replace(array('&amp;', "\n", "\r"), array('&', '', ''), $url), true, $status);
+		header('Location: ' . str_replace(['&amp;', "\n", "\r"], ['&', '', ''], $url), true, $status);
 		exit();
 	}
 	
 	/**
-	 * 
+	 * Set Compression
 	 *
 	 * @param	int		$level
  	*/
@@ -47,7 +51,7 @@ class Response {
 	}
 	
 	/**
-	 * 
+	 * Get Output
 	 *
 	 * @return	array
  	*/
@@ -56,7 +60,7 @@ class Response {
 	}
 	
 	/**
-	 * 
+	 * Set Output
 	 *
 	 * @param	string	$output
  	*/	
@@ -65,7 +69,7 @@ class Response {
 	}
 	
 	/**
-	 * 
+	 * Compress
 	 *
 	 * @param	string	$data
 	 * @param	int		$level
@@ -103,7 +107,9 @@ class Response {
 	}
 	
 	/**
-	 * 
+	 * Output
+	 *
+	 * Displays the set HTML output
  	*/
 	public function output() {
 		if ($this->output) {

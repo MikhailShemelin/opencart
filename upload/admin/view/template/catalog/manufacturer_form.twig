@@ -2,36 +2,35 @@
 <div id="content">
   <div class="page-header">
     <div class="container-fluid">
-      <div class="pull-right">
-        <button type="submit" form="form-manufacturer" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
-        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light"><i class="fa fa-reply"></i></a></div>
+      <div class="float-right">
+        <button type="submit" form="form-manufacturer" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fas fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-light"><i class="fas fa-reply"></i></a></div>
       <h1>{{ heading_title }}</h1>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          {% for breadcrumb in breadcrumbs %}
-            <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
-          {% endfor %}
-        </ol>
-      </nav>
+      <ol class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ol>
     </div>
   </div>
   <div class="container-fluid"> {% if error_warning %}
-      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <div class="alert alert-danger alert-dismissible"><i class="fas fa-exclamation-circle"></i> {{ error_warning }}
         <button type="button" class="close" data-dismiss="alert">&times;</button>
       </div>
     {% endif %}
     <div class="card">
-      <div class="card-header"><i class="fa fa-pencil"></i> {{ text_form }}</div>
+      <div class="card-header"><i class="fas fa-pencil-alt"></i> {{ text_form }}</div>
       <div class="card-body">
         <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-manufacturer">
           <ul class="nav nav-tabs">
             <li class="nav-item"><a href="#tab-general" data-toggle="tab" class="nav-link active">{{ tab_general }}</a></li>
             <li class="nav-item"><a href="#tab-seo" data-toggle="tab" class="nav-link">{{ tab_seo }}</a></li>
+            <li class="nav-item"><a href="#tab-design" data-toggle="tab" class="nav-link">{{ tab_design }}</a></li>
           </ul>
           <div class="tab-content">
             <div class="tab-pane active" id="tab-general">
               <div class="form-group row required">
-                <label class="col-sm-2 col-form-label" for="input-name">{{ entry_name }}</label>
+                <label for="input-name" class="col-sm-2 col-form-label">{{ entry_name }}</label>
                 <div class="col-sm-10">
                   <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control"/>
                   {% if error_name %}
@@ -57,28 +56,26 @@
                 </div>
               </div>
               <div class="form-group row">
-                <label class="col-sm-2 col-form-label" for="input-image">{{ entry_image }}</label>
+                <label for="input-image" class="col-sm-2 col-form-label">{{ entry_image }}</label>
                 <div class="col-sm-10">
-                  <div class="card" style="max-width: 10rem;">
+                  <div class="card image">
                     <img src="{{ thumb }}" alt="" title="" id="thumb-image" data-placeholder="{{ placeholder }}" class="card-img-top"/> <input type="hidden" name="image" value="{{ image }}" id="input-image"/>
-                    <div class="card-footer text-center">
-                      <div class="btn-group btn-group-sm">
-                        <button type="button" data-toggle="image" data-target="input-image" data-thumb="thumb-image" class="btn btn-outline-primary btn-sm"><i class="fa fa-pencil"></i> {{ button_edit }}</button>
-                        <button type="button" data-toggle="clear" data-target="input-image" data-thumb="thumb-image" class="btn btn-outline-danger btn-sm"><i class="fa fa-trash-o"></i> {{ button_clear }}</button>
-                      </div>
+                    <div class="card-body">
+                      <button type="button" data-toggle="image" data-target="#input-image" data-thumb="#thumb-image" class="btn btn-primary btn-sm btn-block"><i class="fas fa-pencil-alt"></i> {{ button_edit }}</button>
+                      <button type="button" data-toggle="clear" data-target="#input-image" data-thumb="#thumb-image" class="btn btn-warning btn-sm btn-block"><i class="fas fa-trash-alt"></i> {{ button_clear }}</button>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="form-group row">
-                <label class="col-sm-2 col-form-label" for="input-sort-order">{{ entry_sort_order }}</label>
+                <label for="input-sort-order" class="col-sm-2 col-form-label">{{ entry_sort_order }}</label>
                 <div class="col-sm-10">
                   <input type="text" name="sort_order" value="{{ sort_order }}" placeholder="{{ entry_sort_order }}" id="input-sort-order" class="form-control"/>
                 </div>
               </div>
             </div>
-            <div class="tab-pane" id="tab-seo">
-              <div class="alert alert-info"><i class="fa fa-info-circle"></i> {{ text_keyword }}</div>
+            <div id="tab-seo" class="tab-pane">
+              <div class="alert alert-info"><i class="fas fa-info-circle"></i> {{ text_keyword }}</div>
               <div class="table-responsive">
                 <table class="table table-bordered table-hover">
                   <thead>
@@ -102,6 +99,35 @@
                               <div class="invalid-tooltip">{{ error_keyword[store.store_id][language.language_id] }}</div>
                             {% endif %}
                           {% endfor %}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div id="tab-design" class="tab-pane">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <td class="text-left">{{ entry_store }}</td>
+                      <td class="text-left">{{ entry_layout }}</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for store in stores %}
+                      <tr>
+                        <td class="text-left">{{ store.name }}</td>
+                        <td class="text-left"><select name="manufacturer_layout[{{ store.store_id }}]" class="form-control">
+                            <option value=""></option>
+                            {% for layout in layouts %}
+                              {% if manufacturer_layout[store.store_id] and manufacturer_layout[store.store_id] == layout.layout_id %}
+                                <option value="{{ layout.layout_id }}" selected="selected">{{ layout.name }}</option>
+                              {% else %}
+                                <option value="{{ layout.layout_id }}">{{ layout.name }}</option>
+                              {% endif %}
+                            {% endfor %}
+                          </select></td>
                       </tr>
                     {% endfor %}
                   </tbody>

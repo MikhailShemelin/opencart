@@ -3,7 +3,7 @@
 $_['code']                          = 'en';
 $_['direction']                     = 'ltr';
 $_['date_format_short']             = 'd/m/Y';
-$_['date_format_long']              = 'l dS F Y';
+$_['date_format_long']              = 'l jS F Y';
 $_['time_format']                   = 'h:i:s A';
 $_['datetime_format']               = 'd/m/Y H:i:s';
 $_['decimal_point']                 = '.';
@@ -17,6 +17,7 @@ $_['text_disabled']                 = 'Disabled';
 $_['text_none']                     = ' --- None --- ';
 $_['text_select']                   = ' --- Please Select --- ';
 $_['text_select_all']               = 'Select All';
+$_['text_all']                      = 'All';
 $_['text_unselect_all']             = 'Unselect All';
 $_['text_all_zones']                = 'All Zones';
 $_['text_default']                  = ' <b>(Default)</b>';
@@ -26,6 +27,20 @@ $_['text_loading']                  = 'Loading...';
 $_['text_no_results']               = 'No results!';
 $_['text_confirm']                  = 'Are you sure?';
 $_['text_home']                     = 'Home';
+$_['text_second_ago']               = 'just now';
+$_['text_seconds_ago']              = '%s seconds ago';
+$_['text_minute_ago']               = '%s minute ago';
+$_['text_minutes_ago']              = '%s minutes ago';
+$_['text_hour_ago']                 = '%s hour ago';
+$_['text_hours_ago']                = '%s hours ago';
+$_['text_day_ago']                  = '%s day ago';
+$_['text_days_ago']                 = '%s days ago';
+$_['text_week_ago']                 = '%s week ago';
+$_['text_weeks_ago']                = '%s weeks ago';
+$_['text_month_ago']                = '%s month ago';
+$_['text_months_ago']               = '%s months ago';
+$_['text_year_ago']                 = '%s year ago';
+$_['text_years_ago']                = '%s years ago';
 
 // Button
 $_['button_add']                    = 'Add New';
@@ -67,9 +82,9 @@ $_['button_special_add']            = 'Add Special';
 $_['button_image_add']              = 'Add Image';
 $_['button_geo_zone_add']           = 'Add Geo Zone';
 $_['button_history_add']            = 'Add History';
+$_['button_transaction_add']        = 'Add Transaction';
 $_['button_translation']            = 'Load Default Translation';
 $_['button_translation_add']        = 'Add Translation';
-$_['button_transaction_add']        = 'Add Transaction';
 $_['button_route_add']              = 'Add Route';
 $_['button_rule_add']               = 'Add Rule';
 $_['button_module_add']             = 'Add Module';
@@ -79,6 +94,7 @@ $_['button_deny']                   = 'Deny';
 $_['button_reset']                  = 'Reset';
 $_['button_generate']               = 'Generate';
 $_['button_voucher_add']            = 'Add Voucher';
+$_['button_view']                   = 'View';
 $_['button_reward_add']             = 'Add Reward Points';
 $_['button_reward_remove']          = 'Remove Reward Points';
 $_['button_commission_add']         = 'Add Commission';
@@ -89,7 +105,6 @@ $_['button_ip_add']                 = 'Add IP';
 $_['button_parent']                 = 'Parent';
 $_['button_folder']                 = 'New Folder';
 $_['button_search']                 = 'Search';
-$_['button_view']                   = 'View';
 $_['button_install']                = 'Install';
 $_['button_uninstall']              = 'Uninstall';
 $_['button_link']                   = 'Link';
@@ -103,12 +118,11 @@ $_['button_restore']                = 'Restore';
 $_['button_run']                    = 'Run Cron Job';
 $_['button_backup']                 = 'Backup';
 $_['button_developer']              = 'Developer Setting';
+$_['button_master']                 = 'Master Product';
 
 // Tab
-$_['tab_affiliate']                 = 'Affiliate';
-$_['tab_address']                   = 'Address';
+$_['tab_address']                   = 'Addresses';
 $_['tab_additional']                = 'Additional';
-$_['tab_admin']                     = 'Admin';
 $_['tab_attribute']                 = 'Attribute';
 $_['tab_comment']                   = 'Comment';
 $_['tab_data']                      = 'Data';
@@ -118,7 +132,6 @@ $_['tab_discount']                  = 'Discount';
 $_['tab_documentation']             = 'Documentation';
 $_['tab_general']                   = 'General';
 $_['tab_history']                   = 'History';
-$_['tab_ftp']                       = 'FTP';
 $_['tab_ip']                        = 'IP Addresses';
 $_['tab_links']                     = 'Links';
 $_['tab_log']                       = 'Log';
@@ -131,19 +144,12 @@ $_['tab_special']                   = 'Special';
 $_['tab_session']                   = 'Session';
 $_['tab_local']                     = 'Local';
 $_['tab_mail']                      = 'Mail';
-$_['tab_module']                    = 'Module';
 $_['tab_product']                   = 'Products';
 $_['tab_reward']                    = 'Reward Points';
 $_['tab_transaction']               = 'Transactions';
 $_['tab_voucher']                   = 'Vouchers';
-$_['tab_sale']                      = 'Sales';
-$_['tab_marketing']                 = 'Marketing';
-$_['tab_online']                    = 'People Online';
-$_['tab_activity']                  = 'Recent Activity';
 $_['tab_recurring']                 = 'Recurring';
 $_['tab_report']                    = 'Report';
-$_['tab_action']                    = 'Action';
-$_['tab_google']                    = 'Google';
 
 // Error
 $_['error_exception']               = 'Error Code(%s): %s in %s on line %s';
@@ -155,11 +161,12 @@ $_['error_upload_6']                = 'Warning: Missing a temporary folder!';
 $_['error_upload_7']                = 'Warning: Failed to write file to disk!';
 $_['error_upload_8']                = 'Warning: File upload stopped by extension!';
 $_['error_upload_999']              = 'Warning: No error code available!';
+$_['error_upload_size']             = 'Warning: The uploaded file exceeds the %smb max file size!';
 $_['error_curl']                    = 'CURL: Error Code(%s): %s';
 
 /* When doing translations only include the matching language code */
 
-// Summernote
+// CKEditor
 //$_['ckeditor']                    = 'af';
 //$_['ckeditor']                    = 'ar';
 //$_['ckeditor']                    = 'az';

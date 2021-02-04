@@ -1,5 +1,5 @@
 <?php
-namespace Cache;
+namespace Opencart\System\Library\Cache;
 class File {
 	private $expire;
 
@@ -29,7 +29,13 @@ class File {
 
 			flock($handle, LOCK_SH);
 
-			$data = fread($handle, filesize($files[0]));
+			$size = filesize($files[0]);
+
+			if ($size > 0) {
+				$data = fread($handle, $size);
+			} else {
+				$data = '';
+			}
 
 			flock($handle, LOCK_UN);
 
@@ -41,10 +47,14 @@ class File {
 		return false;
 	}
 
-	public function set($key, $value) {
+	public function set($key, $value, $expire = '') {
 		$this->delete($key);
 
-		$file = DIR_CACHE . 'cache.' . basename($key) . '.' . (time() + $this->expire);
+		if (!$expire) {
+			$expire = $this->expire;
+		}
+
+		$file = DIR_CACHE . 'cache.' . basename($key) . '.' . (time() + $expire);
 
 		$handle = fopen($file, 'w');
 

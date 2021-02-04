@@ -8,13 +8,12 @@ $_['text_register']             = 'Affiliate Register';
 $_['text_account_already']      = 'If you already have an account with us, please login at the <a href="%s">login page</a>.';
 $_['text_signup']               = 'To create an affiliate account, fill in the form below ensuring you complete all the required fields:';
 $_['text_your_details']         = 'Your Personal Details';
-$_['text_your_address']         = 'Your Address Details';
 $_['text_your_affiliate']       = 'Your Affiliate Information';
 $_['text_your_password']        = 'Your Password';
 $_['text_cheque']               = 'Cheque';
 $_['text_paypal']               = 'PayPal';
 $_['text_bank']                 = 'Bank Transfer';
-$_['text_agree']                = 'I have read and agree to the <a href="%s" class="agree"><b>%s</b></a>';
+$_['text_agree']                = 'I have read and agree to the <a href="%s" class="modal-link"><b>%s</b></a>';
 
 // Entry
 $_['entry_customer_group']      = 'Customer Group';
@@ -43,6 +42,7 @@ $_['error_lastname']            = 'Last Name must be between 1 and 32 characters
 $_['error_email']               = 'E-Mail Address does not appear to be valid!';
 $_['error_telephone']           = 'Telephone must be between 3 and 32 characters!';
 $_['error_custom_field']        = '%s required!';
+$_['error_regex']               = '%s not a valid input!';
 $_['error_cheque']              = 'Cheque Payee Name required!';
 $_['error_paypal']              = 'PayPal Email Address does not appear to be valid!';
 $_['error_bank_account_name']   = 'Account Name required!';

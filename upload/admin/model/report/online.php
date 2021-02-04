@@ -1,23 +1,24 @@
 <?php
-class ModelReportOnline extends Model {
-	public function getOnline($data = array()) {
-		$sql = "SELECT co.ip, co.customer_id, co.url, co.referer, co.date_added FROM " . DB_PREFIX . "customer_online co LEFT JOIN " . DB_PREFIX . "customer c ON (co.customer_id = c.customer_id)";
+namespace Opencart\Application\Model\Report;
+class Online extends \Opencart\System\Engine\Model {
+	public function getOnline($data = []) {
+		$sql = "SELECT co.`ip`, co.`customer_id`, co.`url`, co.`referer`, co.`date_added` FROM `" . DB_PREFIX . "customer_online` co LEFT JOIN `" . DB_PREFIX . "customer` c ON (co.`customer_id` = c.`customer_id`)";
 
-		$implode = array();
+		$implode = [];
 
 		if (!empty($data['filter_ip'])) {
-			$implode[] = "co.ip LIKE '" . $this->db->escape((string)$data['filter_ip']) . "'";
+			$implode[] = "co.`ip` LIKE '" . $this->db->escape((string)$data['filter_ip']) . "'";
 		}
 
 		if (!empty($data['filter_customer'])) {
-			$implode[] = "co.customer_id > 0 AND CONCAT(c.firstname, ' ', c.lastname) LIKE '" . $this->db->escape((string)$data['filter_customer']) . "'";
+			$implode[] = "co.`customer_id` > 0 AND CONCAT(c.`firstname`, ' ', c.`lastname`) LIKE '" . $this->db->escape((string)$data['filter_customer']) . "'";
 		}
 
 		if ($implode) {
 			$sql .= " WHERE " . implode(" AND ", $implode);
 		}
 
-		$sql .= " ORDER BY co.date_added DESC";
+		$sql .= " ORDER BY co.`date_added` DESC";
 
 		if (isset($data['start']) || isset($data['limit'])) {
 			if ($data['start'] < 0) {
@@ -36,17 +37,17 @@ class ModelReportOnline extends Model {
 		return $query->rows;
 	}
 
-	public function getTotalOnline($data = array()) {
-		$sql = "SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "customer_online` co LEFT JOIN " . DB_PREFIX . "customer c ON (co.customer_id = c.customer_id)";
+	public function getTotalOnline($data = []) {
+		$sql = "SELECT COUNT(*) AS `total` FROM `" . DB_PREFIX . "customer_online` co LEFT JOIN `" . DB_PREFIX . "customer` c ON (co.`customer_id` = c.`customer_id`)";
 
-		$implode = array();
+		$implode = [];
 
 		if (!empty($data['filter_ip'])) {
-			$implode[] = "co.ip LIKE '" . $this->db->escape((string)$data['filter_ip']) . "'";
+			$implode[] = "co.`ip` LIKE '" . $this->db->escape((string)$data['filter_ip']) . "'";
 		}
 
 		if (!empty($data['filter_customer'])) {
-			$implode[] = "co.customer_id > 0 AND CONCAT(c.firstname, ' ', c.lastname) LIKE '" . $this->db->escape((string)$data['filter_customer']) . "'";
+			$implode[] = "co.`customer_id` > '0' AND CONCAT(c.`firstname`, ' ', c.`lastname`) LIKE '" . $this->db->escape((string)$data['filter_customer']) . "'";
 		}
 
 		if ($implode) {

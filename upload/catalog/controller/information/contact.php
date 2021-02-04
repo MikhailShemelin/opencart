@@ -1,6 +1,7 @@
 <?php
-class ControllerInformationContact extends Controller {
-	private $error = array();
+namespace Opencart\Application\Controller\Information;
+class Contact extends \Opencart\System\Engine\Controller {
+	private $error = [];
 
 	public function index() {
 		$this->load->language('information/contact');
@@ -8,7 +9,7 @@ class ControllerInformationContact extends Controller {
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-			$mail = new Mail($this->config->get('config_mail_engine'));
+			$mail = new \Opencart\System\Library\Mail($this->config->get('config_mail_engine'));
 			$mail->parameter = $this->config->get('config_mail_parameter');
 			$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
 			$mail->smtp_username = $this->config->get('config_mail_smtp_username');
@@ -17,27 +18,27 @@ class ControllerInformationContact extends Controller {
 			$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
 
 			$mail->setTo($this->config->get('config_email'));
-			$mail->setFrom($this->config->get('config_email'));
+			$mail->setFrom($this->request->post['email']);
 			$mail->setReplyTo($this->request->post['email']);
 			$mail->setSender(html_entity_decode($this->request->post['name'], ENT_QUOTES, 'UTF-8'));
 			$mail->setSubject(html_entity_decode(sprintf($this->language->get('email_subject'), $this->request->post['name']), ENT_QUOTES, 'UTF-8'));
 			$mail->setText($this->request->post['enquiry']);
 			$mail->send();
 
-			$this->response->redirect($this->url->link('information/contact/success', 'language=' . $this->config->get('config_language')));
+			$this->response->redirect($this->url->link('information/contact|success', 'language=' . $this->config->get('config_language')));
 		}
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('information/contact', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
 		if (isset($this->error['name'])) {
 			$data['error_name'] = $this->error['name'];
@@ -64,7 +65,7 @@ class ControllerInformationContact extends Controller {
 		$this->load->model('tool/image');
 
 		if ($this->config->get('config_image')) {
-			$data['image'] = $this->model_tool_image->resize($this->config->get('config_image'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_location_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_location_height'));
+			$data['image'] = $this->model_tool_image->resize(html_entity_decode($this->config->get('config_image'), ENT_QUOTES, 'UTF-8'), $this->config->get('config_image_location_width'), $this->config->get('config_image_location_height'));
 		} else {
 			$data['image'] = false;
 		}
@@ -78,21 +79,21 @@ class ControllerInformationContact extends Controller {
 		$data['open'] = nl2br($this->config->get('config_open'));
 		$data['comment'] = $this->config->get('config_comment');
 
-		$data['locations'] = array();
+		$data['locations'] = [];
 
 		$this->load->model('localisation/location');
 
-		foreach((array)$this->config->get('config_location') as $location_id) {
+		foreach ((array)$this->config->get('config_location') as $location_id) {
 			$location_info = $this->model_localisation_location->getLocation($location_id);
 
 			if ($location_info) {
-				if ($location_info['image']) {
-					$image = $this->model_tool_image->resize($location_info['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_location_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_location_height'));
+				if (is_file(DIR_IMAGE . html_entity_decode($location_info['image'], ENT_QUOTES, 'UTF-8'))) {
+					$image = $this->model_tool_image->resize(html_entity_decode($location_info['image'], ENT_QUOTES, 'UTF-8'), $this->config->get('config_image_location_width'), $this->config->get('config_image_location_height'));
 				} else {
-					$image = false;
+					$image = '';
 				}
 
-				$data['locations'][] = array(
+				$data['locations'][] = [
 					'location_id' => $location_info['location_id'],
 					'name'        => $location_info['name'],
 					'address'     => nl2br($location_info['address']),
@@ -102,7 +103,7 @@ class ControllerInformationContact extends Controller {
 					'image'       => $image,
 					'open'        => nl2br($location_info['open']),
 					'comment'     => $location_info['comment']
-				);
+				];
 			}
 		}
 
@@ -125,8 +126,12 @@ class ControllerInformationContact extends Controller {
 		}
 
 		// Captcha
-		if ($this->config->get('captcha_' . $this->config->get('config_captcha') . '_status') && in_array('contact', (array)$this->config->get('config_captcha_page'))) {
-			$data['captcha'] = $this->load->controller('extension/captcha/' . $this->config->get('config_captcha'), $this->error);
+		$this->load->model('setting/extension');
+
+		$extension_info = $this->model_setting_extension->getExtensionByCode('captcha', $this->config->get('config_captcha'));
+
+		if ($extension_info && $this->config->get('captcha_' . $this->config->get('config_captcha') . '_status') && in_array('contact', (array)$this->config->get('config_captcha_page'))) {
+			$data['captcha'] = $this->load->controller('extension/'  . $extension_info['extension'] . '/captcha/' . $extension_info['code'], $this->error);
 		} else {
 			$data['captcha'] = '';
 		}
@@ -142,21 +147,38 @@ class ControllerInformationContact extends Controller {
 	}
 
 	protected function validate() {
-		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 32)) {
+		$keys = [
+			'name',
+			'email',
+			'telephone',
+			'enquiry'
+		];
+
+		foreach ($keys as $key) {
+			if (!isset($this->request->post[$key])) {
+				$this->request->post[$key] = '';
+			}
+		}
+
+		if (!isset($this->request->post['name']) || (utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 32)) {
 			$this->error['name'] = $this->language->get('error_name');
 		}
 
-		if (!filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)) {
+		if (!isset($this->request->post['email']) || !filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)) {
 			$this->error['email'] = $this->language->get('error_email');
 		}
 
-		if ((utf8_strlen($this->request->post['enquiry']) < 10) || (utf8_strlen($this->request->post['enquiry']) > 3000)) {
+		if (!isset($this->request->post['enquiry']) || (utf8_strlen($this->request->post['enquiry']) < 10) || (utf8_strlen($this->request->post['enquiry']) > 3000)) {
 			$this->error['enquiry'] = $this->language->get('error_enquiry');
 		}
 
 		// Captcha
-		if ($this->config->get('captcha_' . $this->config->get('config_captcha') . '_status') && in_array('contact', (array)$this->config->get('config_captcha_page'))) {
-			$captcha = $this->load->controller('extension/captcha/' . $this->config->get('config_captcha') . '/validate');
+		$this->load->model('setting/extension');
+
+		$extension_info = $this->model_setting_extension->getExtensionByCode('captcha', $this->config->get('config_captcha'));
+
+		if ($extension_info && $this->config->get('captcha_' . $this->config->get('config_captcha') . '_status') && in_array('contact', (array)$this->config->get('config_captcha_page'))) {
+			$captcha = $this->load->controller('extension/'  . $extension_info['extension'] . '/captcha/' . $extension_info['code'] . '|validate');
 
 			if ($captcha) {
 				$this->error['captcha'] = $captcha;
@@ -171,19 +193,19 @@ class ControllerInformationContact extends Controller {
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'] = [];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('text_home'),
 			'href' => $this->url->link('common/home', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['breadcrumbs'][] = array(
+		$data['breadcrumbs'][] = [
 			'text' => $this->language->get('heading_title'),
 			'href' => $this->url->link('information/contact', 'language=' . $this->config->get('config_language'))
-		);
+		];
 
-		$data['text_message'] = $this->language->get('text_success');
+		$data['text_message'] = $this->language->get('text_message');
 
 		$data['continue'] = $this->url->link('common/home', 'language=' . $this->config->get('config_language'));
 

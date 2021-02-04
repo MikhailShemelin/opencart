@@ -68,6 +68,7 @@ $_['text_reward']                = 'Reward Points';
 
 // Column
 $_['column_order_id']            = 'Order ID';
+$_['column_store']               = 'Store';
 $_['column_customer']            = 'Customer';
 $_['column_status']              = 'Status';
 $_['column_date_added']          = 'Date Added';
@@ -134,4 +135,5 @@ $_['help_override']              = 'If the customers order is being blocked from
 $_['error_warning']              = 'Warning: Please check the form carefully for errors!';
 $_['error_permission']           = 'Warning: You do not have permission to modify orders!';
 $_['error_action']               = 'Warning: Could not complete this action!';
+$_['error_empty']                = 'Warning: Shopping cart is empty!';
 $_['error_filetype']             = 'Invalid file type!';
